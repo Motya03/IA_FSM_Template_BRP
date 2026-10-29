@@ -28,7 +28,7 @@ public sealed class GameEnvironment
                 //se ordenan alfabeticamente) para que siga la ruta que queremos
                 instance.checkpoints = instance.checkpoints.OrderBy(waypoint => waypoint.name).ToList();
 
-               instance.hidingSpots = GameObject.FindGameObjectsWithTag("hide");
+               instance.hidingSpots = GameObject.FindGameObjectsWithTag("Safe");
             }
             return instance;
         }
