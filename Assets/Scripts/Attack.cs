@@ -18,7 +18,7 @@ public class Attack : State
 	
     public override void Enter()
     {
-        //TODO
+        stage = EVENT.UPDATE;
         base.Enter();
     }
 	

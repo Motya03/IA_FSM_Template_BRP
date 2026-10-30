@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -20,6 +20,9 @@ public class State
     protected Transform player; //El guardian necesita saber donde esta el jugador
     protected State nextState; //Estado siguiente al que estamos actualmente
     protected NavMeshAgent agent;
+    public float visionDistance = 10f;
+    public float angleVision = 60f;
+    
 
     //When the NPC is able to see or interact with the player
     float visDist = 10.0f;
@@ -57,12 +60,38 @@ public class State
     //seguir mejor el codigo lo pondremos todo aqui
     public bool CanSeePlayer()
     {
-        //TODO  
+        Vector3 direccion = player.position - npc.transform.position;
+
+        // 1. Comprobar distancia
+        if (direccion.magnitude > visionDistance)
+            return false;
+
+        // 2. Comprobar ángulo de visión
+        float angulo = Vector3.Angle(npc.transform.forward, direccion);
+
+        if (angulo > angleVision / 2f)
+            return false;
+
+        // 3. Comprobar si hay obstáculos
+        if (Physics.Raycast(
+            npc.transform.position,
+            direccion.normalized,
+            out RaycastHit hit,
+            visionDistance))
+        {
+            return hit.transform == player ||
+                   hit.transform.IsChildOf(player);
+        }
+
         return false;
+        
     }
 
-    //El jugador esta detras del NPC a una distancia menor a 2 y en un angulo de 30
-    public bool IsPlayerBehind()
+
+    
+
+//El jugador esta detras del NPC a una distancia menor a 2 y en un angulo de 30
+public bool IsPlayerBehind()
     {
         //TODO  
         return false;

@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System;
 
 //Este es el codigo que adjuntaremos a nuestro NPC (Ugg)
 public class AI : MonoBehaviour
 {
-    NavMeshAgent agent;
-    Animator anim;
-    public Transform player; 
+    [SerializeField] private NavMeshAgent agent;
+    [SerializeField] private Animator anim;
+    [SerializeField] private Transform player;
+    public int index ;
 
     State currentState;
     void Start()
@@ -20,6 +22,15 @@ public class AI : MonoBehaviour
 
 	void Update()
     {
+       
         currentState = currentState.Process();
+    }
+   public void PlusIndex()
+    {
+                index++;
+        if (index >= 5)
+        {
+            index = 0;
+        }
     }
 }

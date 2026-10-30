@@ -4,25 +4,31 @@ using UnityEngine;
 using UnityEngine.AI;
 public class Pursue: State
 {
+    private float stopDistance = 5f;
     public Pursue(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player) : base(_npc, _agent, _anim, _player)
     {
         name = STATE.PURSUE;
-        //TODO
+        
     }
     public override void Enter()
     {
-        //TODO
+        agent.SetDestination(player.position);
+        stage = EVENT.UPDATE;
         base.Enter();
     }
     public override void Update()
     {
-       //TODO
-        stage = EVENT.EXIT;
+       if (agent.remainingDistance <= stopDistance)
+        {
+            agent.isStopped = true;
+            stage = EVENT.EXIT;
+        }
+        
     }
 
     public override void Exit()
     {
-        //TODO
+        nextState = new Attack(npc, agent, anim, player);
         base.Exit();
     }
 

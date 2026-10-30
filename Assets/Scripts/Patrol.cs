@@ -1,83 +1,113 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
+
+
 
 //Mover el personaje por los wayPoints, necesita un index para saber por donde vamos
 //Recuerda que no tenemos que guardar los waypoints en ningún sitio
 //puesto que la clase GameEnvirontment (Singleton) ya lo hace
 public class Patrol: State
 {
-   [SerializeField] private GameEnvironment game;
-    public List<Transform> check = new List<Transform>();
-    GameObject npcE1;
-    NavMeshAgent agentE1;
-    Animator animE1;
-    Transform playerE1;
+  
+    private List<GameObject> checkpoints;
+    public bool notOnTheWay;
+    float canCheckTime = 0.5f;
+    float timer;
+    int indexCount;
+
+
+
     int completedLoops;
-    int currentIndex = -1;
+    
+    Vector3 targetNpc;
+  
+    private int currentCheckpoint = 0;
+   
     public Patrol(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player) : base(_npc, _agent, _anim, _player)
     {
-        this.npc = npcE1;
-        this.agent = agentE1;
-        this.anim = animE1;
-        this.player = playerE1;
+        
         name = STATE.PATROL;
+
        //TODO
     }
 
     public override void Enter()
     {
-        
+        AI ia = npc.GetComponent<AI>();
 
-        GetDestinatiion();
-        stage = EVENT.UPDATE;
-        Debug.Log("Start PAtrol");
-        //TODO
+        indexCount = ia.index;
+        timer = 0;
+        checkpoints = GameEnvironment.Singleton.Checkpoints;
+
+        // Avanzar al siguiente checkpoint
+        currentCheckpoint = (currentCheckpoint + indexCount) % checkpoints.Count;
+
+       
+        GetDestination();
+
+        agent.isStopped = false;
+       // anim.SetTrigger("isWalking");
+
+        Debug.Log("Start Patrol");
+
+        agent.SetDestination(targetNpc);
+       ia.PlusIndex();
+    
         base.Enter();
-
     }
     public override void Update()
     {
-    
-    
-        if (agentE1.remainingDistance == 0.1 )
+        anim.SetTrigger("isWalking");
+
+        bool playerInSight = CanSeePlayer();
+
+        // Comprobar si hemos llegado al destino
+        if (HasReachedDestination())
         {
-            GetDestinatiion();
+            Debug.Log("Change to Idle");
+            nextState = new Idle(npc, agent, anim, player);
+            stage = EVENT.EXIT;
             return;
         }
-        if (player)
-         //TODO
-         stage = EVENT.EXIT;
+
+        if (playerInSight)
+        {
+            Debug.Log("Start Pursue");
+            anim.SetTrigger("isRunning");
+            nextState = new Pursue(npc, agent, anim, player);
+            stage = EVENT.EXIT;
+        }
     }
 
+    // Método auxiliar para comprobar si llegamos al destino de forma segura
+    private bool HasReachedDestination()
+    {
+        // Comprobaciones de seguridad
+        if (agent.pathPending) return false;
+        if (!agent.hasPath) return false;
+        if (agent.pathStatus != NavMeshPathStatus.PathComplete) return false;
+
+        // Comprobar distancia con un pequeño margen
+        return agent.remainingDistance <= agent.stoppingDistance + 0.1f;
+    }
     public override void Exit()
     {
+       // NextCheckpoint();
         //TODO
         base.Exit();
     }
 
-    public Transform GetRandomTransform()
+   
+    private void GetDestination()
     {
+        checkpoints = GameEnvironment.Singleton.Checkpoints;
 
-       // GameObject[] check = game.Checkpoints
-        // Проверяем, что список не пустой, чтобы избегнуть ошибок
-        if (check == null || check.Count == 0)
-        {
-            Debug.LogWarning("Список Transform пуст!");
-            return null;
-        }
+        targetNpc = checkpoints[currentCheckpoint].transform.position;
 
-        // Получаем случайный индекс от 0 до количества элементов в списке
-        int randomIndex = Random.Range(0, check.Count);
-
-        // Возвращаем случайный Transform
-        return check[randomIndex];
     }
-    private void GetDestinatiion()
-    {
-        Transform targetPoint = GetRandomTransform();
-        Vector3 targetPosition = targetPoint.position;
-    }
+
+   
+    
 }
