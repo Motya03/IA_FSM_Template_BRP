@@ -1115,7 +1115,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3523726435930200185, guid: 6478176b8cb434cba99100779c3a0ff2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.51
+      value: -1.68
       objectReference: {fileID: 0}
     - target: {fileID: 3523726435930200185, guid: 6478176b8cb434cba99100779c3a0ff2, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1123,7 +1123,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3523726435930200185, guid: 6478176b8cb434cba99100779c3a0ff2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 14.36
+      value: 5.58
       objectReference: {fileID: 0}
     - target: {fileID: 3523726435930200185, guid: 6478176b8cb434cba99100779c3a0ff2, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1746,6 +1746,7 @@ MonoBehaviour:
   agent: {fileID: 786520893}
   anim: {fileID: 786520896}
   player: {fileID: 1516847984}
+  index: 0
 --- !u!95 &786520896 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 431280034300401484, guid: 87f465c82db6b484ca3ec1be1dd799fb, type: 3}

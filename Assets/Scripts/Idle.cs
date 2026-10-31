@@ -22,22 +22,42 @@ public class Idle : State //Clase Idle que hereda de State
     //Debemos ahora crear las 3 funciones (public override) para las etapas de Enter, Update y Exit de esta clase/estado
     public override void Enter()
     {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+
+        if (!stateInfo.IsName("Rifle Idle"))
+        {
+            anim.SetTrigger("isIdle");
+        }
+      
        
         //TODO
         timer = 0;
         
         agent.isStopped = true;
         // stage = EVENT.UPDATE;
-        Debug.Log("Entering Idle");
+        
+       
         base.Enter(); //Aqui ya se hace stage = EVENT.UPDATE;, no necesitamos hacerlo aqui
     }
 
     //Update se ejecuta una y otra vez y necesita un evento que le haga salir (que rompa la secuencia)
     public override void Update()
     {
-        anim.SetTrigger("isIdle");
+       
         timer += Time.deltaTime;
-        
+        bool playerInSight = CanSeePlayer();
+        bool playerBehind = IsPlayerBehind();
+        if (playerInSight)
+        {
+            nextState = new Pursue(npc, agent, anim, player);
+            stage = EVENT.EXIT;
+        }
+        if (playerBehind)
+        {
+
+            nextState = new RunAway(npc, agent, anim, player);
+            stage = EVENT.EXIT;
+        }
         if (timer > idleTime)
         {
            
@@ -49,7 +69,7 @@ public class Idle : State //Clase Idle que hereda de State
     public override void Exit()
     {
         //TODO
-        Debug.Log("Exititing Idle");
+      
         base.Exit();
     }
 }

@@ -20,14 +20,16 @@ public class State
     protected Transform player; //El guardian necesita saber donde esta el jugador
     protected State nextState; //Estado siguiente al que estamos actualmente
     protected NavMeshAgent agent;
-    public float visionDistance = 10f;
+    public float visionDistance = 15f;
     public float angleVision = 60f;
-    
+    private float playerAttackDistance = 2f;
+    public float anglePlayerAttack = 180f;
+
 
     //When the NPC is able to see or interact with the player
     float visDist = 10.0f;
     float visAngle = 30.0f; //En grados
-    float shootDist = 7.0f; //Ataca si esta asi de cerca
+    float shootDist = 4.0f; //Ataca si esta asi de cerca
 
     //Constructor
     public State(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player)
@@ -51,7 +53,9 @@ public class State
         if (stage == EVENT.EXIT)
         {
             Exit();
+            Debug.Log("Siguiente estado: " + nextState.name);
             return nextState; //Siguiente estado
+           
         }
         return this; //Devolvemos el mismo estado
     }
@@ -93,13 +97,37 @@ public class State
 //El jugador esta detras del NPC a una distancia menor a 2 y en un angulo de 30
 public bool IsPlayerBehind()
     {
+        Vector3 direction = player.position - npc.transform.position;
+        if (direction.magnitude >= playerAttackDistance)
+        {
+            return false;
+        }
+        float angle = Vector3.Angle(-npc.transform.forward, direction);
+        if (angle > anglePlayerAttack / 2f)
+        {
+            return false;
+        }
+        if (Physics.Raycast(npc.transform.position, direction.normalized, out RaycastHit hit, playerAttackDistance))
+        {
+            if (hit.transform == player || hit.transform.IsChildOf(player))
+            {
+                return true;
+            }
+        }
         //TODO  
         return false;
     }
 
     public bool CanAttackPlayer()
     {
-        //TODO  
+        Vector3 direction = player.position - npc.transform.position;
+        if (direction.magnitude <= shootDist)
+        {
+            return true;
+        }
+        
+     
         return false;
+
     }
 }

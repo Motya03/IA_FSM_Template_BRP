@@ -33,4 +33,9 @@ public class AI : MonoBehaviour
             index = 0;
         }
     }
+    public void PlayShootSound()
+    {
+        AudioSource shoot = this.GetComponent<AudioSource>();
+        shoot.PlayOneShot(shoot.clip);
+    }
 }

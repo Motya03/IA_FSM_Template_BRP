@@ -35,6 +35,17 @@ public class Patrol: State
 
     public override void Enter()
     {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+
+        if (!stateInfo.IsName("Rifle Walk"))
+        {
+            anim.ResetTrigger("isRunning");
+          //  anim.ResetTrigger("isIdle");
+            anim.ResetTrigger("isShooting");
+            anim.SetTrigger("isWalking");
+            Debug.Log("Walk");
+        }
+       
         AI ia = npc.GetComponent<AI>();
 
         indexCount = ia.index;
@@ -46,12 +57,13 @@ public class Patrol: State
 
        
         GetDestination();
-
+        agent.speed = 1f;
         agent.isStopped = false;
        // anim.SetTrigger("isWalking");
 
-        Debug.Log("Start Patrol");
+        
 
+      
         agent.SetDestination(targetNpc);
        ia.PlusIndex();
     
@@ -59,14 +71,15 @@ public class Patrol: State
     }
     public override void Update()
     {
-        anim.SetTrigger("isWalking");
 
+      
         bool playerInSight = CanSeePlayer();
+        bool playerBehind = IsPlayerBehind();
 
         // Comprobar si hemos llegado al destino
         if (HasReachedDestination())
         {
-            Debug.Log("Change to Idle");
+           
             nextState = new Idle(npc, agent, anim, player);
             stage = EVENT.EXIT;
             return;
@@ -74,9 +87,15 @@ public class Patrol: State
 
         if (playerInSight)
         {
-            Debug.Log("Start Pursue");
+           
             anim.SetTrigger("isRunning");
             nextState = new Pursue(npc, agent, anim, player);
+            stage = EVENT.EXIT;
+        }
+        if (playerBehind)
+        {
+            
+            nextState = new RunAway(npc, agent, anim, player);
             stage = EVENT.EXIT;
         }
     }

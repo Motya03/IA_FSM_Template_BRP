@@ -12,23 +12,48 @@ public class Pursue: State
     }
     public override void Enter()
     {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+
+        if (!stateInfo.IsName("Rifle Run"))
+        {
+            // anim.ResetTrigger("isRunning");
+            // anim.ResetTrigger("isIdle");
+            anim.ResetTrigger("isWalking");
+            anim.ResetTrigger("isShooting");
+            anim.SetTrigger("isRunning");
+            Debug.Log("Pursue");
+        }
+
+       
+        agent.isStopped = false;
+        agent.speed = 3f;
         agent.SetDestination(player.position);
-        stage = EVENT.UPDATE;
+        
         base.Enter();
     }
     public override void Update()
     {
-       if (agent.remainingDistance <= stopDistance)
+       
+        bool playerInSight = CanSeePlayer();
+        bool canAtack = CanAttackPlayer();
+       if (canAtack )
         {
             agent.isStopped = true;
+            nextState = new Attack(npc, agent, anim, player);
             stage = EVENT.EXIT;
         }
-        
+       if (!playerInSight)
+        {
+          nextState = new Patrol(npc, agent, anim, player);
+            stage = EVENT.EXIT;
+        }
+      
+
     }
 
     public override void Exit()
     {
-        nextState = new Attack(npc, agent, anim, player);
+       
         base.Exit();
     }
 

@@ -13,14 +13,27 @@ public class RunAway : State
     }
     public override void Enter()
     {
-       //TODO
+        agent.isStopped = false;
+        agent.SetDestination(safeLocation.transform.position);
+        agent.speed = 3f;
+        anim.ResetTrigger("isShooting");
+        anim.ResetTrigger("isWalking");
+       if (!anim.GetCurrentAnimatorStateInfo(0).IsName("Rifle Run"))
+        {
+            anim.SetTrigger("isRunning");
+        }
+      
         base.Enter();
     }
     public override void Update()
     {
-
+        if (agent.remainingDistance <= agent.stoppingDistance && !agent.pathPending)
+        {
+            nextState = new Patrol(npc, agent, anim, player);
+            stage = EVENT.EXIT;
+        }
         //TODO
-        stage = EVENT.EXIT;
+        
     }
 
     public override void Exit()
